@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>13-千分位用逗号隔开</div>
+    <script>
+        // 思路 先将字符串分成小鼠 和整数部分
+        // 小数部分 拼接上逗号 等后续返回时拼接上
+        // 整数部分 判断是不是3的整数倍 然后通过模的余数 添加',''
+
+        // 有小鼠的千分位
+          let format= n=>{
+            let num = n.toString()
+            let numInt=null
+            let decimals = ''
+            // 判断是否有小数
+            num.indexOf('.')>-1?decimals = num.split('.')[1]:decimals
+            // 注意 这里使用整数部分做判断
+            if(num.indexOf('.')>-1)
+            numInt = num.split('.')[0]
+            let len = numInt.length
+            console.log(len)
+            if(len<=3){
+                return num
+            }
+           else{
+            let temp = ''
+            let remaindex = len %3
+            decimals?temp = '.' +decimals:temp
+            if(remaindex>0){
+                return num.slice(0,remaindex)+','+num.slice(remaindex,len).match(/\d{3}/g).join(',')+temp
+            }else{
+                return num.slice(0,len).match(/\d{3}/g).join(',')+temp
+            }
+           } 
+        }
+        console.log(format(123.333))
+
+        // 无小鼠版本
+        // let format = n=>{
+        //     let num  = n.toString()
+        //     let len = num.length;
+        //     if(len<=3){
+        //         return num
+        //     } else {
+        //         let remainder = len%3
+        //         if(remainder>0){
+        //             return num.slice(0,remainder)+','+num.slice(remainder,len).match(/\d{3}/g).join(',')
+        //         }
+        //         else {
+        //             return num.slice(remainder,len).match(/\d{3}/g).join(',')
+        //         }
+        //     }
+        // }
+        // console.log(format(12345))
+
+    </script>
+</body>
+
+</html>
+
+<!-- split 用法是 字符串以某个符号做分隔符 分成字符串数组的形式   -->

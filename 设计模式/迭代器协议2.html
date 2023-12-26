@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计模式</title>
+</head>
+
+<body>
+  <h2>迭代器模式</h2>
+  <script>
+    const obj = {
+        [Symbol.iterator](){
+            const arr = ['北京','广州','上海']
+            let index = 0
+
+            return {
+                next(){
+                    if(index<arr.length)
+                    {
+                        return {done:false,value:arr[index++]}
+                    }
+                    return {done:true}
+                }
+            }
+        }
+    }
+
+    for(const iterator of obj){
+        console.log('iterator',iterator)
+    }
+  </script>
+</body>
+
+</html>

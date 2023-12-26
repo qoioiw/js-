@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+    <div>04-函数柯里化应用</div>
+    <script>
+        // function typeOfTest(type){
+        //     return function ifUndefind(thing){
+        //         return typeof thing === type
+        //     }
+        // }
+
+        // 简化成一行代码
+        const typeOfTest = type =>thing=>typeof thing === type
+
+        const isString = typeOfTest('string')
+        const isUndefine = typeOfTest('undefine')
+        const  isFunction = typeOfTest('function')
+
+        console.log(isString('123'))
+        console.log(isUndefine('123'))
+        console.log(isFunction('123'))
+</script>
+</body>
+</html>

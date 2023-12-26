@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>12-日期格式化函数</div>
+    <script>
+
+        function formatData(formatInput,format){
+            let year = formatInput.getFullYear()
+            let month = formatInput.getMonth()
+            let day = formatInput.getDate()
+
+            format = format.replace(/yyyy/,year)
+            format =format.replace(/MM/,month)
+            format =format.replace(/dd/,day)
+            return format
+        }
+
+        console.log(formatData(new Date('2020-02-03'),'yyyy/MM/dd'))
+        console.log(formatData(new Date('2020-02-03'),'yyyy/MM/dd'))
+        console.log(formatData(new Date('2020-02-03'),'yyyy年MM月dd日'))
+    </script>
+</body>
+
+</html>
+

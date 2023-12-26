@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>寄生组合继承</div>
+    <script>
+        function Person(name){
+            this.name = name
+        }
+        Person.prototype.sayHi = function(){
+            console.log(`你好，我叫${this.name}`)
+        }
+
+        function Student(name)
+        {
+            Person.call(this,name)
+        }
+
+        const prototype = Object.create(Person.prototype,{
+            constructo:{
+                value:Student
+            }
+        })
+
+        Student.prototype = prototype
+
+        const s= new Student('itheima')
+    </script>
+</body>
+
+</html>

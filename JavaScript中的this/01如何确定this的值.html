@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何确认this的值</title>
+</head>
+
+<body>
+  <h2>如何确认this的值</h2>
+  <script>
+    // Function.prototype.myCall=function (argThing,...res)
+    // {
+    //     const key = Symbol('key')
+    //     argThing[key] = this
+    //     const sum = argThing[key](...res)
+    //     console.log(sum)
+    //     delete argThing[key]
+    // }
+
+    Function.prototype.myApply=function (argThing,res)
+    {
+        const key = Symbol('key')
+        argThing[key] = this
+        const sum = argThing[key](...res)
+        console.log(sum)
+        delete argThing[key]
+    }
+
+    const food = {
+        name :'西红柿'
+    }
+
+    function func(a,b,c){
+        console.log(a,b,c)
+        console.log(this.name)
+        return a+b+c
+    }
+
+    // func.myCall(food,1,2,3)
+    func.myApply(food,[1,2,3])
+  </script>
+</body>
+
+</html>

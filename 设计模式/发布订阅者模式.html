@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设计模式</title>
+</head>
+
+<body>
+    <h2>发布订阅模式</h2>
+    <button class="on">注册事件</button>
+    <button class="emit">触发事件</button>
+    <button class="off">移除事件</button>
+    <button class="once-on">一次性事件注册</button>
+    <button class="once-emit">一次性事件触发</button>
+    <script>
+        class HMEmmiter {
+            #handle = {
+
+            }
+
+            $on(event, callbcak) {
+                if (this.#handle[event] === undefined) {
+                    this.#handle[event] = []
+                }
+                this.#handle[event].push(callbcak)
+            }
+
+            $emit(event, ...arg) {
+                const func = this.#handle[event] || []
+                func.forEach(callbcak => {
+                    callbcak(...arg)
+                })
+            }
+
+            $off(event) {
+                this.#handle[event] = []
+            }
+            $once(event, callback) {
+                this.$on(event, (...args) => {
+                    callback(...args)
+                    this.$off(event)
+                })
+            }
+        }
+
+
+        const bus = new HMEmmiter()
+
+        document.querySelector('.on').addEventListener('click', () => {
+            bus.$on('event1', () => { console.log('回调函数1') })
+            bus.$on('event2', (name, info) => { console.log(name, info) })
+            bus.$on('event2', (name, info) => { console.log('event2的第二个回调函数', name, info) })
+        })
+        // 触发事件
+        document.querySelector('.emit').addEventListener('click', () => {
+            bus.$emit('event1')
+            bus.$emit('event2', 'itheima', '666')
+        })
+        // 移除事件
+        document.querySelector('.off').addEventListener('click', () => {
+            bus.$off('event2')
+        })
+        // 一次性事件注册
+        document.querySelector('.once-on').addEventListener('click', () => {
+            bus.$once('once-event', (name, info) => {
+                console.log(name, info)
+            })
+        })
+        // 一次性事件触发
+        document.querySelector('.once-emit').addEventListener('click', () => {
+            bus.$emit('once-event', 'itheima', '666')
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>测试</div>
+    <script>
+        const URL = 'https://api.oioweb.cn/api/common/OneDayEnglish'
+        let xhr = new XMLHttpRequest()
+        xhr.open('GET', URL, true)
+
+        xhr.onreadystatechange = function () {
+            if (this.status !== 4) return
+            if (this.status === 200) {
+                console.log(this.response)
+            } else {
+                console.error(this.statusText)
+            }
+        }
+
+        xhr.onerror = function(){
+            console.error(this.statusText)
+        }
+
+        xhr.response = 'json'
+        xhr.send()
+    </script>
+</body>
+
+</html>

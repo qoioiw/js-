@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+    <div>03-函数柯里化</div>
+    <script>
+        function sum(callBack,length){
+            let len = length
+            let num = []
+            let fn = callBack
+            return function (...args){
+                num.push(...args)
+                console.log(num)
+                if(num.length>=len)
+                {
+                    const res = fn.apply(this,num)
+                    return res 
+                }
+                else 
+                {
+                    return sum
+                }
+            }
+        }
+        function test(a,b,c){
+            return a+b+c
+        }
+
+        let callBack=sum(test,3)
+        callBack(1)
+        let res  = callBack(2,3)
+        console.log("res",res)
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>05-数组扁平化</div>
+    <script>
+        // 递归实现
+        // let arr = [1, [2, [3, 4, 5]]]
+
+        // function flatten(arr) {
+        //     let result = []
+
+        //     for (let i = 0; i < arr.length; i++) {
+        //         if (Array.isArray(arr[i]))
+        //         // 合并返回来的数组
+        //             result = result.concat(flatten(arr[i]))
+        //         else {
+        //             result.push(arr[i])
+        //         }
+        //     }
+        //     return result
+        // }
+
+        // console.log(flatten(arr))
+
+        // reduce函数迭代
+        // let arr = [1, [2, [3, 4, 5]]]
+        // function flatten(arr) {
+        //     return arr.reduce(function (prev, next) {
+        //         return prev.concat(Array.isArray(next) ? flatten(next) : next)
+        //     }, [])
+        // }
+        // console.log(flatten(arr))
+
+        // 扩展运算符实现
+        // let arr = [1, [2, [3, 4, 5]]]
+        // function flatten(arr){
+        //     while(arr.some(item=>Array.isArray(item))){
+        //         console.log(...arr)
+        //         arr = [].concat(...arr)
+        //     }
+        //     return arr
+        // }
+        // console.log(flatten(arr))
+
+        // split和toString
+        // let arr = [1, [2, [3, 4, 5]]]
+        // function flatten(arr) {
+        //     return arr.toSting(), split(',')
+        // }
+        // console.log(flatten(arr))
+
+        // ES6中的flat
+        // let arr = [1,[2,3,[4,5]]]
+        // function flatten(arr){
+        //     return arr.flat(Infinity)
+        // }
+        // console.log(flatten(arr))
+
+        // 正则和JSON方法
+        let arr = [1,[2,3,[4,5]]]
+        function flatten(arr){
+            let str = JSON.stringify(arr)
+            str = str.replace(/(\[|\])/g,'')
+            str = '['+str+']'
+            return JSON.parse(str)
+        }
+        console.log(flatten(arr))
+    </script>
+</body>
+
+</html>

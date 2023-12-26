@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>手写call方法1sassd</div>
+    <script>
+        // Function.prototype.mycall=function(thisArge,...args){
+        //     const key = Symbol('key')
+        //     thisArge[key]= this
+        //     const res = thisArge[key](...args)
+        //     delete thisArge[key]
+        //     return res
+        // }
+        // Function.prototype.myApply=function(thisArge,args){
+        //     const key = Symbol('key')
+        //     thisArge[key]= this
+        //     const res = thisArge[key](...args)
+        //     delete thisArge[key]
+        //     return res
+        // }
+        // Function.prototype.myBind=function(thisArg,...rag){
+        //     return (...resArg)=>{
+        //         return this.call(thisArg,...rag,...resArg)
+
+        //     }
+        // }
+        const food ={
+            name:'食物'
+        }
+        function eat(numa,numb,numc,numd){
+            console.log(this)
+            console.log(numa,numb,numc,numd)
+            return numa+numb+numc+numd
+        }
+        const f = eat.myBind(food,1,2,3,4)
+        const res= f()
+        console.log("res:",res)
+    </script>
+</body>
+
+</html>

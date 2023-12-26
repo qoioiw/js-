@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+    <div>01-手写AJAX请求</div>
+    <script>
+        const SERVER_URL = 'https://api.oioweb.cn/api/common/OneDayEnglish';
+
+        let xhr = new XMLHttpRequest();
+
+        // 创建Http请求
+        xhr.open('GET', SERVER_URL, true);
+
+        // 设置状态监听函数
+        xhr.onreadystatechange = function () {
+            if (this.readyState !== 4) return;
+            // 当请求成功时 
+            if (this.status === 200) {
+                console.log(this.response);
+            } else {
+                console.error(this.statusText);
+            }
+        };
+
+        // 设置请求失败时的监听函数
+        xhr.onerror = function () {
+            console.error(this.statusText);
+        };
+
+        // 设置响应类型
+        xhr.responseType = 'json';
+
+        // 发送Http请求
+        xhr.send();
+    </script>
+</body>
+</html>
+

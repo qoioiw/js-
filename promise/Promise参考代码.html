@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手写Promise</title>
+</head>
+
+<body>
+  <h2>静态方法-any</h2>
+  <script>
+
+    function runAsynctask(callback) {
+      if (typeof queueMicrotask === 'function') {
+        queueMicrotask(callback)
+      } else if (typeof MutationObserver === 'function') {
+        const obs = new MutationObserver(callback)
+        const divNode = document.createElement('div')
+        obs.observe(divNode, { childList: true })
+        divNode.innerText = 'itheima666'
+      } else {
+        setTimeout(callback, 0)
+      }
+    }
+
+    function resolvePromise(p2, x, resolve, reject) {
+      if (x === p2) {
+        throw new TypeError('Chaining cycle detected for promise #<Promise>')
+      }
+      if (x instanceof HMPromise) {
+        x.then(res => resolve(res), err => reject(err))
+      } else {
+        resolve(x)
+      }
+    }
+
+    const PENDING = 'pending'
+    const FULFILLED = 'fulfilled'
+    const REJECTED = 'rejected'
+    class HMPromise {
+      // 状态
+      state = PENDING
+      // 原因
+      result = undefined
+      // 回调函数数组
+      #handlers = [] // [{onFulfilled,onRejected}...]
+
+      // 构造函数
+      constructor(func) {
+        // pending->fulfilled
+        const resolve = (result) => {
+          if (this.state === PENDING) {
+            this.state = FULFILLED
+            this.result = result
+            this.#handlers.forEach(({ onFulfilled }) => {
+              onFulfilled(this.result)
+            })
+          }
+        }
+
+        // pending->rejected
+        const reject = (result) => {
+          if (this.state === PENDING) {
+            this.state = REJECTED
+            this.result = result
+            this.#handlers.forEach(({ onRejected }) => {
+              onRejected(this.result)
+            })
+          }
+        }
+
+        try {
+          func(resolve, reject)
+        } catch (error) {
+          reject(error)
+        }
+      }
+
+      // then方法
+      then(onFulfilled, onRejected) {
+        onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : x => x
+        onRejected = typeof onRejected === 'function' ? onRejected : x => { throw x }
+
+        const p2 = new HMPromise((resolve, reject) => {
+          if (this.state === FULFILLED) {
+            runAsynctask(() => {
+              try {
+                const x = onFulfilled(this.result)
+                resolvePromise(p2, x, resolve, reject)
+              } catch (error) {
+                reject(error)
+              }
+            })
+          }
+
+          else if (this.state === REJECTED) {
+            runAsynctask(() => {
+              try {
+                const x = onRejected(this.result)
+                resolvePromise(p2, x, resolve, reject)
+              } catch (error) {
+                reject(error)
+              }
+            })
+          }
+
+          else if (this.state === PENDING) {
+            this.#handlers.push({
+              onFulfilled: () => {
+                runAsynctask(() => {
+                  try {
+                    const x = onFulfilled(this.result)
+                    resolvePromise(p2, x, resolve, reject)
+                  } catch (error) {
+                    reject(error)
+                  }
+                })
+              }, onRejected: () => {
+                runAsynctask(() => {
+                  try {
+                    const x = onRejected(this.result)
+                    resolvePromise(p2, x, resolve, reject)
+                  } catch (error) {
+                    reject(error)
+                  }
+                })
+              }
+            })
+          }
+        })
+
+        return p2
+      }
+
+      // catch方法
+      catch(onRejected) {
+        return this.then(undefined, onRejected)
+      }
+
+      // finally方法
+      finally(onFinally) {
+        return this.then(onFinally, onFinally)
+      }
+
+      // 静态方法-resolve
+      static resolve(value) {
+        if (value instanceof HMPromise) {
+          return value
+        }
+        return new HMPromise((resolve) => {
+          resolve(value)
+        })
+      }
+
+      // 静态方法-reject
+      static reject(value) {
+        return new HMPromise((undefined, reject) => {
+          reject(value)
+        })
+      }
+
+      // 静态方法-race
+      static race(promises) {
+        return new HMPromise((resolve, reject) => {
+          if (!Array.isArray(promises)) {
+            return reject(new TypeError('Argument is not iterable'))
+          }
+          promises.forEach(p => {
+            HMPromise.resolve(p).then(res => { resolve(res) }, err => { reject(err) })
+          })
+        })
+      }
+
+      // 静态方法-all
+      static all(promises) {
+        return new HMPromise((resolve, reject) => {
+          if (!Array.isArray(promises)) {
+            return reject(new TypeError('Argument is not iterable'))
+          }
+          promises.length === 0 && resolve(promises)
+          const results = []
+          let count = 0
+          promises.forEach((p, index) => {
+            HMPromise.resolve(p).then(res => {
+              results[index] = res
+              count++
+              count === promises.length && resolve(results)
+            }, err => {
+              reject(err)
+            })
+          })
+        })
+      }
+
+      // 静态方法-allSettled
+      static allSettled(promises) {
+        return new HMPromise((resolve, reject) => {
+          if (!Array.isArray(promises)) {
+            return reject(new TypeError('Argument is not iterable'))
+          }
+          promises.length === 0 && resolve(promises)
+
+          const results = []
+          let count = 0
+          promises.forEach((p, index) => {
+            HMPromise.resolve(p).then(res => {
+              results[index] = { status: FULFILLED, value: res }
+              count++
+              count === promises.length && resolve(results)
+            }, err => {
+              results[index] = { status: REJECTED, reason: err }
+              count++
+              count === promises.length && resolve(results)
+            })
+          })
+        })
+      }
+
+      /**
+       * 静态方法-any
+       * 1. 返回Promise,数组判断 错误信息: Argument is not iterable
+       * 2. 空数组直接拒绝 AggregateError([错误原因1..],All promises were rejected)
+       * 3. 等待结果
+       *  3.1 第一个兑现
+       *  3.2 全部拒绝
+      */
+      static any(promises) {
+        // 1. 返回Promise,数组判断
+        return new HMPromise((resolve, reject) => {
+          if (!Array.isArray(promises)) {
+            return reject(new TypeError('Argument is not iterable'))
+          }
+          // 2. 空数组直接拒绝
+          promises.length === 0 && reject(new AggregateError(promises, 'All promises were rejected'))
+
+          // 3. 等待结果
+          const errors = []
+          let count = 0
+          promises.forEach((p, index) => {
+            HMPromise.resolve(p).then(res => {
+              // 3.1 第一个兑现
+              resolve(res)
+            }, err => {
+              // 3.2 全部拒绝
+              errors[index] = err
+              count++
+              count === promises.length && reject(new AggregateError(errors, 'All promises were rejected'))
+            })
+          })
+        })
+      }
+
+    }
+
+
+
+
+    // ------------- 测试代码 手写Promise -------------
+    const p1 = new HMPromise((resolve, reject) => {
+      setTimeout(() => {
+        reject(1)
+      }, 2000)
+    })
+    // const p2 = 2
+    const p2 = HMPromise.reject(2)
+    const p3 = new HMPromise((resolve, reject) => {
+      setTimeout(() => {
+        // resolve(3)
+        reject(3)
+      }, 1000)
+    })
+
+    HMPromise.any([p1, p2, p3]).then(res => {
+      // HMPromise.any().then(res => {
+      // HMPromise.any([]).then(res => {
+      console.log('res:', res)
+    }, err => {
+      console.dir(err)
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ------------- 测试代码 原生Promise  -------------
+    // const p1 = new Promise((resolve, reject) => {
+    //   setTimeout(() => {
+    //     reject(1)
+    //   }, 2000)
+    // })
+
+    // // const p2 = 2
+    // const p2 = Promise.reject(2)
+
+    // const p3 = new Promise((resolve, reject) => {
+    //   setTimeout(() => {
+    //     // resolve(3)
+    //     reject(3)
+    //   }, 1000)
+    // })
+
+    // /**
+    //  * 静态方法-any
+    //  * 1. 参数:
+    //  *  1.1 Promise数组
+    //  * 2. 结果:
+    //  *  2.1 获取到第一个成功的原因
+    //  *  2.2 获取到所有的拒绝原因 AggregateError: All promises were rejected--[拒绝原因1,决绝原因n]
+    //  *  2.3 传入空数组,直接拒绝 AggregateError: All promises were rejected --[]
+    //  *  2.4 不传入数组,直接报错
+    //  * */
+    // Promise.any([p1, p2, p3]).then(res => {
+    //   // Promise.any([]).then(res => {
+    //   // Promise.any().then(res => {
+    //   console.log('res:', res)
+    // }, err => {
+    //   // console.log('err:', err)
+    //   console.dir(err)
+    // })
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>

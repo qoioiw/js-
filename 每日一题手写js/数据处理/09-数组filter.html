@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>09-filter</div>
+    <script>
+        Array.prototype._filter = function(fn){
+            if(typeof fn !== 'function'){
+                throw Error('参数必须是一个函数')
+            }
+            const res=[]
+            for(let i=0,len=this.length;i<len;i++){
+                fn(this[i])&&res.push(this[i])
+            }
+            return res
+        }
+    </script>
+</body>
+
+</html>

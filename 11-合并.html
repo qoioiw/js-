@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+    <div>11-合并对象</div>
+    <script>
+        let sss={a:1,b:{c:2,d:{f:3}}}
+        let aaa={a:1,b:{c:2,d:{f:222}}}
+       Object.myAssign = function(target,...source){
+        if(target==null){
+            return new TypeError('Connot copy null')
+        }
+        let res=Object(target)
+        source.forEach(function(resItem){
+            if(resItem!=null){
+                for(let key in resItem){
+                    if(resItem.hasOwnProperty(key)){
+                        res[key]=resItem[key]
+                    }
+                }
+            }
+        }) 
+        return res
+       }
+       
+      let gg = Object.myAssign(sss,aaa)
+      console.log(gg)
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何确认this的值</title>
+</head>
+
+<body>
+  <h2>如何确认this的值</h2>
+  <script>
+    // Function.prototype.myCreate = function (thisArg,...res){
+    //     return (...reArgs)=>{
+    //         return this.call(thisArg,...res,...reArgs)}
+    // }
+
+    Function.prototype.myCreate  = function (arg,...res){
+        return (...argThing)=>{
+            return this.call(arg,...res,...argThing)
+        }
+    }
+
+    function Person(name){
+        this.name = name
+    } 
+
+    Person.prototype.sayHi = function (){
+        console.log(`${this.name}`)
+    }
+
+    function Student(){
+        Person.call(this,name)
+    }
+
+    const prototype = Object.create(Person.prototype,{
+        constructor:{value:Student}
+    })
+
+    Student.prototype = prototype
+
+    const s = new  Student('itheima')
+
+  </script>         
+</body>
+
+</html>

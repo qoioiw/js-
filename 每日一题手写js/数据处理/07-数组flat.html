@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>07-数组flat</div>
+    <script>
+        function _flat(arr,depth){
+            if(!Array.isArray(arr)||depth<=0){
+                return arr 
+            }
+            return arr.reduce((prev,cur)=>{
+                if(Array.isArray(cur)){
+                    return prev.concat(_flat(cur,depth-1))
+                }else{
+                    return prev.concat(cur)
+                }
+            },[])
+        } 
+    </script>
+</body>
+
+</html>

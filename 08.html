@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fetch提交FormData</title>
+</head>
+
+<body>
+    <h2>构造promise</h2>
+    <script>
+        // 执行异步任务
+        function runAsynctask(callback) {
+            if (typeof queueMicrotask === 'function') {
+                queueMicrotask(callback)
+            }
+            else if (typeof MutationObserver === 'function') {
+                const obs = new MutationObserver(callback)
+                const divNode = document.createElement('div')
+                obs.observe(divNode, { childList: true })
+                divNode.innerHTML = 'itheima666'
+            }
+            else {
+                setTimeout(callback, 0)
+            }
+        }
+
+        function resolvePromise(p2, x, resolve, reject) {
+            if (x === p2) {
+                throw new TypeError('Chaining cycle detected for promise #<Promise>')
+            }
+            if (x instanceof HMpromise) {
+                x.then(res => resolve(res), err => reject(err))
+            }
+            else {
+                resolve(x)
+            }
+        }
+
+        const PENDING = 'pending'
+        const RESOLVE = 'resolve'
+        const REJECT = 'reject'
+        class HMpromise {
+            state = PENDING
+            result = undefined
+            #handlers = []
+            constructor(func) {
+                console.log('在构造函数中')
+                const resolve = (result) => {
+                    if (this.state === PENDING) {
+                        this.state = RESOLVE
+                        this.result = result
+                        this.#handlers.forEach(({ onFulfilled }) => {
+                            onFulfilled(this.result)
+                        })
+                    }
+                    // console.log('resolve-执行了 ',result)
+                }
+                const reject = (result) => {
+                    if (this.state === PENDING) {
+                        this.state = REJECT
+                        this.result = result
+                        this.#handlers.forEach(({ onRejected }) => {
+                            onRejected(this.result)
+                        })
+                    }
+                    // console.log('reject-执行了 ',result)
+                }
+
+                func(resolve, reject)
+            }
+
+            then(onFulfilled, onRejected) {
+                console.log('构造函数中的then执行了')
+                onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : x => x
+                onRejected = typeof onRejected === 'function' ? onRejected : x => { throw x }
+
+                const p2 = new HMpromise((resolve, reject) => {
+                    if (this.state === RESOLVE) {
+                        runAsynctask(() => {
+                            try {
+                                const x = onFulfilled(this.result)
+                                resolvePromise(p2, x, resolve, reject)
+                            } catch (error) {
+                                reject(error)
+                            }
+                        })
+                    } else if (this.state === REJECT) {
+                        runAsynctask(() => {
+                            try {
+                                const x = onRejected(this.result)
+                                resolvePromise(p2, x, resolve, reject)
+                            }
+                            catch (error) {
+                                reject(error)
+                            }
+                        })
+                    } else if (this.state === PENDING) {
+                        console.log('我在做判断')
+                        this.#handlers.push({
+                            onFulfilled: () => {
+                                console.log('我在执行push')
+                                runAsynctask(() => {
+                                    try {
+                                        const x = onFulfilled(this.result)
+                                        resolvePromise(p2, x, resolve, reject)
+                                    }
+                                    catch (error) {
+                                        reject(error)
+                                    }
+                                })
+                            }, onRejected: () => {
+                                runAsynctask(() => {
+                                    try {
+                                        const x = onRejected(this.result)
+                                        resolvePromise(p2, x, resolve, reject)
+                                    }
+                                    catch (error) {
+                                        reject(error)
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+                )
+                return p2
+            }
+        }
+
+        const p = new HMpromise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(1)
+            }, 2000)
+        })
+
+        const p2 = p.then(res => {
+            // throw 'error'
+            //  return p2
+            //   return 2
+            return new HMpromise((resolve, reject) => {
+                console.log('.then 构造函数的')
+
+                setTimeout(() => {
+                    resolve('resolve-2')
+                    console.log('p:', p)
+                    // reject('reject-2')
+                }, 2000)
+                console.log('.then 构造函数的')
+            })
+        })
+
+        const p3 = p2.then(res => {
+            console.log('p2-res:', res)
+            console.log(p2)
+
+        }, err => {
+            console.log('px-err:', err)
+        })
+        const p4 = p3.then(res => {
+            console.log('p2-res:', res)
+            console.log("p3:", p3)
+        }, err => {
+            console.log('px-err:', err)
+        })
+        console.log('end')
+    </script>
+</body>
+
+</html>

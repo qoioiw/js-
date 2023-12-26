@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <h2>fetch提交FromData</h2>
+    <input type="file" class="ipt">
+    <img class="icon" src="">
+    <script>
+    document.querySelector('.ipt').addEventListener('change',async function(){
+        const img = this.files[0]
+        const data =new FormData()
+        data.append('img',img)
+        const res = await fetch('http://hmajax.itheima.net/api/uploadimg',{
+            method:'post',
+            body:data
+        })
+        const resData = await res.json()
+        console.log(resData)
+
+        document.querySelector('.icon').src = resData.data.url
+    })
+    </script>
+</body>
+
+</html>

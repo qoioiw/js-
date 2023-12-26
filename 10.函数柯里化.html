@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+    <div>10-函数柯里化</div>
+    <script>
+       function cally(fn,...args)
+       {
+        let length = fn.length
+
+        let args = args || []
+        
+        return function(args1){
+            
+            let currentArgs = args.slice(0)
+
+            for(let i=0;i<args1.length;i++)
+            {
+                currentArgs.push(args1[i])
+            }
+
+            if(currentArgs.length>=length)
+            {
+                return  fn.apply(this,currentArgs)
+            }else
+            {
+                return  cally(this,fn,currentArgs)
+            }
+        }
+        }
+    </script>
+</body>
+</html>

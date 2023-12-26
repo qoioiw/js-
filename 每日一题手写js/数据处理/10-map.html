@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>10-数组map方法</div>
+    <script>
+        Array.prototype._map=function(fn){
+            if(typeof fn !=='function'){
+                throw TypeError('参数必须是一个函数')
+            }
+            const res = []
+            for(let i=0,len=this.length;i<len;i++){
+                res.push(fn(this[i]))
+            }
+            return res
+        }
+    </script>
+</body>
+
+</html>

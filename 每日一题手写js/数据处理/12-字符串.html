@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>12-字符串反转</div>
+    <script>
+      String.prototype._reverse = function(a){
+        // 将字符串变成数组 然后就是用数组的reverse反转 最后用join拼接回字符串
+        return a.split('').reverse().join("")
+      }
+      var obj = new String()
+      var res = obj._reverse('hello')
+      console.log(res)
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>08-数组的push方法</div>
+    <script>
+        let arr = []
+        Array.prototype.push=function(){
+            for(let i=0;i<arguments.length;i++){
+                this[this.length] =arguments[i]
+            }
+            return this.length
+        }
+ </script>
+</body>
+
+</html>

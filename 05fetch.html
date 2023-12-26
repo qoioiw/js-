@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <h2>fetch核心语法</h2>
+    <button class="btn">测试</button>
+    <script>
+       document.querySelector('.btn').addEventListener('click',async ()=>{
+        const p = new URLSearchParams({pname:'广东省',cname:'深圳市'})
+
+        const res = await fetch('http://hmajax.itheima.net/api/area?'+p.toString())
+        if(res.status >= 200 && res.status<300)
+        {
+            const data = await res.json()
+            console.log(data)
+        }else{
+            console.log('请求异常',res.status)
+        }
+       })
+    </script>
+</body>
+
+</html>

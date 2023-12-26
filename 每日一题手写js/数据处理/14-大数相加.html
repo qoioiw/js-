@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>14-大数相加</div>
+    <script>
+        function sumBigNUmber(a,b){
+            let res = ''
+            let temp = 0
+
+            a = a.toString().split('')
+            b = b.toString().split('')
+
+            while(a.length||b.length||temp){
+                // ~~表示转换为数字  a.pop()表示从a数组末尾处取出
+                temp+=~~a.pop()+~~b.pop()
+                res =(temp%10)+res
+                temp = temp/10
+            }
+            // 去掉字符串前面多余的0
+            return res.replace(/^0+/,'')
+        }
+        console.log(sumBigNUmber(111,222))
+    </script>
+</body>
+
+</html>

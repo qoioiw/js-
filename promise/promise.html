@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手写Promise</title>
+</head>
+
+<body>
+    <h2>静态方法-any</h2>
+    <script>
+        function f(p2, x, resolve, reject) {
+            if (x === p2) {
+                throw new TypeError('promise循环调用了')
+            }
+            if (x instanceof myPromise) {
+                x.then(res => resolve(res), err => reject(err))
+            }
+            else {
+                resolve(x)
+            }
+        }
+
+        const PENDING = 'pending'
+        const FULFILLED = 'fulfilled'
+        const REJECTED = 'rejected'
+        class myPromise{
+            state = PENDING
+            result = undefined
+            #handles = []
+
+            constructor(func){
+
+                const resolve = (result) => {
+                    if (this.state === PENDING) {
+                        this.state = FULFILLED
+                        this.result = result
+                        this.#handles.forEach(({ onFulfilled }) => {
+                            onFulfilled(this.result)
+                        })
+                    }
+                }
+
+                const reject = (result) => {
+                    if (this.state === PENDING) {
+                        this.state = FULFILLED
+                        this.result = result
+                        this.#handles.forEach(({ onRejected }) => {
+                            onRejected(this.result)
+                        })
+                    }
+                }
+                try {
+                    func(resolve, reject)
+
+                } catch (error) {
+                    reject(error)
+                }
+            }
+
+            then(onFulfilled, onRejected){
+                 onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : x => x
+                 onRejected = typeof onRejected === 'function' ? onRejected : x => { throw x }
+
+                const p2 = new myPromise((resolve, reject) => {
+                    if (this.state === FULFILLED) {
+                        setTimeout(() => {
+                            try {
+                                const x = onFulfilled(this.result)
+                                f(p2, x, resolve, reject)
+                            } catch (err) {
+                                reject(err)
+                            }
+                        }, 0)
+                    } else if (this.state === REJECTED) {
+                        setTimeout(() => {
+                            try {
+                                const x = onRejected(this.result)
+                                f(p2, x, resolve, reject)
+                            } catch (err) {
+                                reject(err)
+                            }
+                        }, 0)
+                    }
+                    else if (this.state === PENDING) {
+
+                        this.#handles.push({
+                            onFulfilled: () => {
+                                setTimeout(() => {
+                                    try {
+                                        const x = onFulfilled(this.result)
+                                        f(p2, x, resolve, reject)
+                                    } catch (err) {
+                                        reject(err)
+                                    }
+                                }, 0)
+                            },
+                            onRejected: () => {
+                                setTimeout(() => {
+                                    try {
+                                        const x = onRejected(this.result)
+                                        f(p2, x, resolve, reject)
+                                    } catch (err) {
+                                        reject(err)
+                                    }
+                                }, 0)
+                            }
+                        })
+                    }
+                })
+            return p2
+
+            }
+        }
+
+        const p = new myPromise((resolve, reject) => {
+            // reject(1)
+            setTimeout(() => {
+                // reject(2)
+                resolve(1)
+            }, 0);
+
+            // return p
+        })
+
+        const p2= p.then(res => {
+            // return p2
+            console.log(res)
+            return new myPromise((resolve,reject)=>{
+                resolve(2)
+            })
+        }, err => {
+            console.log(err)
+        })
+        p2.then(res => {
+            console.log(res)
+        }, err => {
+            console.log(err)
+        })
+    </script>
+</body>
+
+</html>

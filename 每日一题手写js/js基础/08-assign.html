@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>08-合并对象</div>
+    <script>
+        Object.myAssign = function (target, ...source) {
+            if (target == null) {
+                throw new TypeError('Cannot convert undefine or null to object')
+            }
+            let ret = Object(target)
+            source.forEach(function (obj) {
+                if (obj != null) {
+                    for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            ret[key] = obj[key]
+                        }
+                    }
+                }
+            })
+            return ret
+        }
+        // let sss = { a: 1, b: { c: 2, d: { f: 3 } } }
+        // let aaa = { a: 1, b: { c: 2, d: { f: 222 } } }
+        // let gg = Object.myAssign(sss, aaa)
+        // console.log(gg)
+    </script>
+</body>
+
+</html>
+<!-- 
+    array.forEach(function(currentValue, index, array) {
+    // 在这里执行对当前元素的操作
+}, thisArg);
+
+array 是要遍历的数组。
+currentValue 是当前遍历到的元素的值。
+index 是当前遍历到的元素的索引。
+array 是数组本身。
+thisArg 是可选的，它是在执行回调函数时使用的 this 值。
+ -->

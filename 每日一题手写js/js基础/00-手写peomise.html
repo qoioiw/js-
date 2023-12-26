@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>00-手写peomise</div>
+    <script>
+
+
+        function f(p2, x, resolve, reject) {
+            if (x === p2) {
+                throw new TypeError('promise循环调用了')
+
+            }
+            if (x instanceof myPromise) {
+                x.then(res => resolve(res), err => reject(err))
+            } else {
+
+                resolve(x)
+            }
+        }
+
+
+        const PENDING = 'pending'
+        const FULFILLED = 'fulfilled'
+        const REJECTED = 'rejected'
+
+        class myPromise {
+            state = PENDING
+            result = undefined
+            #handle = []
+
+            constructor(func) {
+
+                const resolve = (result) => {
+                    if (this.state === PENDING) {
+
+                        this.state = FULFILLED
+
+                        this.result = result
+
+                        this.#handle.forEach(({ onFulfilled }) => {
+                            onFulfilled(this.result)
+                        })
+                    }
+
+                  
+                }
+                const reject = (result) => {
+                        if (this.state === PENDING) {
+                            this.state = REJECTED
+                            this.result = result
+                            this.#handle.forEach(({ onRejected }) => {
+                                onRejected(this.result)
+                            })
+                        }
+                    }
+
+                    try {
+                        func(resolve, reject)
+
+                    } catch (error) {
+                        reject(error)
+                    }
+            }
+
+            then(onFulfilled, onRejected) {
+                onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : x => x
+                onRejected = typeof onRejected === 'function' ? onRejected : x => { throw x }
+
+                const p2 = new myPromise((resolve, reject) => {
+                    if (this.state === FULFILLED) {
+                        setTimeout(() => {
+                            try {
+                                const x = onFulfilled(this.result)
+                                f(p2, x, resolve, reject)
+                            }
+                            catch (err) {
+                                reject(err)
+                            }
+                        }, 0)
+                    }
+                    else if (this.state === REJECTED) {
+                        setTimeout(() => {
+                            try {
+                                const x = onRejected(this.result)
+                                f(p2, x, resolve, reject)
+                            } catch (err) {
+                                reject(err)
+                            }
+                        }, 0)
+                    }
+                    else if (this.state === PENDING) {
+                        this.#handle.push(
+                            {
+                                onFulfilled: () => {
+                                    setTimeout(() => {
+                                        try {
+                                            const x = onFulfilled(this.result)
+                                            f(p2, x, resolve, reject)
+                                        } catch (err) {
+                                            reject(err)
+                                        }
+                                    }, 0)
+                                },
+                                onRejected: () => {
+                                    setTimeout(() => {
+                                        try {
+                                            const x = onRejected(this.result)
+                                            f(p2, x, resolve, reject)
+                                        } catch (err) {
+                                            reject(err)
+                                        }
+                                    }, 0)
+                                }
+                            }
+                        )
+                    }
+                })
+
+                return p2
+            }
+        }
+
+
+       
+    </script>
+</body>
+
+</html>
+

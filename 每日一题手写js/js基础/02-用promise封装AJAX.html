@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>02-用promise封装AJAX</div>
+    <script>
+        const URL = 'https://api.oioweb.cn/api/common/OneDayEnglish'
+        // 使用promise封装实现
+        function getJSON(url) {
+            // 创建一个peomise对象
+            let promise = new Promise(function (resolve, reject) {
+
+                let xhr = new XMLHttpRequest()
+                // 创建Http请求
+
+                xhr.open('GET', url, true)
+                // 设置状态监听函数
+
+                xhr.onreadystatechange = function () {
+                    if (this.readyState !== 4) return
+                    // 当请求成功时 
+
+                    if (this.status === 200) {
+                        resolve(this.response)
+                    } else {
+                        reject(this.statusText)
+                    }
+                }
+                // 设置请求失败时的监听函数
+
+                xhr.onerror = function () {
+                    console.error(this.statusText)
+                    // 设置响应类型
+                }
+                xhr.responseType = "json"
+                // 发送Http请求
+
+                xhr.send()
+            })
+            return promise
+        }
+        getJSON(URL).then(res => {
+            console.log(res)
+        })
+    </script>
+
+</body>
+
+</html>

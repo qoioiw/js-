@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+</head>
+
+<body>
+    <div>06-数组去重</div>
+    <script>
+        //    es6
+        // const array = [1, 2, 3, 4, 5, 1, 2, 3, 4, 5]
+        // console.log(Array.from(new Set(array)))
+
+        // es5
+        const array = [1, 2, 3, 4, 5, 1, 2, 3, 4, 5]
+ 
+        uniqueArray(array)
+
+        function uniqueArray(array){
+            let map = {}
+            let res = []
+            for(var i =0;i<array.length;i++)
+            {
+                if(!map.hasOwnProperty(array[i])){
+                    map[array[i]] = 1;
+                    res.push(array[i])
+                }
+            }
+            return res
+        }
+        console.log(uniqueArray(array))
+    </script>
+</body>
+
+</html>
